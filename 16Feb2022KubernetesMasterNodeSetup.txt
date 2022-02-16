@@ -1,0 +1,31 @@
+Step1 : all servers
+
+https://docs.docker.com/engine/install/
+---
+
+sudo mkdir /etc/docker
+cat <<EOF | sudo tee /etc/docker/daemon.json
+{
+"exec-opts": ["native.cgroupdriver=systemd"],
+"log-driver": "json-file",
+"log-opts": {
+"max-size": "100m"
+},
+"storage-driver": "overlay2"
+}
+EOF
+
+----------
+sudo systemctl enable docker
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+
+----
+========================================================================================
+Step 2: all servers (refer SetupMasterNodeInAWSK8S document)
+https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+========================================================================================
+Step 3: On Master
+Kubeadm init
+kubectl apply -f
+"https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"

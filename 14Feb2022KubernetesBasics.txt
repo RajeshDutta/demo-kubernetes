@@ -1,0 +1,126 @@
+K8S Basics
+--------------------------
+*Kubernetes: K8S== "Koo-Ber-Net-Eez" Provide Blue Green Deployment and Canary Deployments, etc.
+*Logo: Helmsman of ship (To manage the direction of ship, where container in docker is in ship), control the ships where container is.
+*AKS (Azure Kubernetes Service), Amazon Elastic Kubernetes Service(EKS), GKE (Google Kubernetes Engine).
+1. (KuberNetes) Basic YouTube:
+https://www.youtube.com/watch?v=xi4VLYrwFgg
+https://www.youtube.com/watch?v=rTNR7vDQDD8
+2. Deploy Java Applicataion in K8S:
+https://www.youtube.com/watch?v=JJnPLZq6yDg&ab_channel=rieckpil
+https://medium.com/avmconsulting-blog/application-deployment-in-kubernetes-956472d635a1
+3. Tutorials Book: https://www.tutorialspoint.com/kubernetes/index.htm
+==============================================================================================
+*NOTES: Basic Points to Know for working on K8S.
+---
+1.Kubernetes: Container Orchastration Platform / Tools (for Zero Downtime, CI/CD )
+---
+2.Pod : Smallest resource in K8S (Container or Volume is inside these pods), then K8S manage this pods. IP assigned to pod, not in container.
+---
+3.Replica Set/ Replica Controlled: (Create copy of pods and monitor continously, if pod down..then delete that pod and create a new pod).
+---
+4.Deployment: Deployment(Top in Hierarchy) >> Replica Set/Replica Controller >>Pods>> Nodes (K8S Cluster).
+---
+5.Namespace: Separate Name for Sepate Service. Like one for development, one for production etc. We give different namespaces.
+---
+6.Service: For Creation services like PortMapping, Traffic Redirect (Load Balancing) within two or more nodes.
+---
+====================================================================================================
+K8S CLUSTER ARCHITECTURE
+(i)K8S Master Node (Either Physical/ or Virtual Machine):
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Controller Manager, Schedular, API Server (Communiation Medium,store data in etcd), Etcd (a database for key:value pair all data, like node,configuration,account, replica control,etc).
+(a) Kube Schedular: Check that our pod will go on which node (is RAM memory free or not).
+(b) Controller: For ex:AC (if temp:24, ac off...if temp:30, ac on ..that works automatically).
+                Maintain Resources and Working process. (If this user need four replica of this pod, provide by controller).
+       types of controller: pod controller, node controller (in every 5 seconds), replica controller, replica set controller, deployment controller
+-----
+(ii)K8S Worker Node (Either Physical/ or Virtual Machine):
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+kubectl command convert in JSON then hit the API Server. End user only talk with API Server. 
+ (a)kubelet: for creation and deletion of pods and also monitor creted by K8S only, not manually created pods are monitored.
+ (b)kube-proxy: proper traffic rules setup where two or more pods communicate together, these type of network related rules.
+====================================================================================================
+cubectl run / create / apply (defference of these 3 commands)
+Update and Delete of pods
+Manual Scheduling
+====================================================================================================
+INSTALLATION SETUP OF MINIKUBE IN WINDOWS SERVER 2019 DATACENTER
+1.Download Minikube: https://github.com/kubernetes/minikube/releases/tag/v1.25.1
+OR
+https://minikube.sigs.k8s.io/docs/start/
+
+2.Download Cubectl: https://dl.k8s.io/release/v1.23.0/bin/windows/amd64/kubectl.exe
+
+3. Create a folder name "Kubernetes" in C:
+then paste the both software (RENAME "minikube___version.exe" into "minikube.exe" and cubectl)
+
+4. Set Class Path in UserVariableForAdministrator (Not in System variable):
+This PC>> properties >>UserVariableForAdministrator (Not in System variable)
+Path= C:\Kubernetes  >> OK
+
+5. Open CMD >> type "minikube"
+
+6. in CMD type "minikube start" it will create a VM in our HYPER-V
+====================================================================================================
+COMMANDS 
+-----
+1. kubectl get pods :list all the pods running on cluster.
+---
+2. minikube ip  : get the IP of MINIKUBE VM (ex: 192.168.49.2)
+---
+3. minikube ssh : Inter into minikube VM using ssh.
+---
+4. then $ sudo apt-get update
+   $ sudo apt install net-tools
+   $ ifconfig (Now ifconfig command will work)
+5. logout  OR CTRL+D
+---
+6. $ minikube dashboard    (to get the DASHBOARD)
+http://127.0.0.1:55760/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/#/workloads?namespace=default
+---
+7. kubectl get node OR  kubectl get nodes : list all node
+
+====================================================================================================
+SETUP WORKING ENVIRONMENTS AND THEIR COMMANDS 
+-----
+C:\Users\Administrator>minikube ssh
+---
+docker@minikube:~$ sudo apt-get install bash-completion
+---
+docker@minikube:~$ echo $SHELL
+/bin/bash
+docker@minikube:~$ cubectl completion bash
+OR
+C:\Users\Administrator>kubectl completion bash (in windows)
+---
+
+====================================================================================================
+C:\Users\Administrator>kubectl cluster-info
+C:\Users\Administrator>kubectl version
+C:\Users\Administrator>kubectl create deployment hello-world-rest-api --image=in28min/hello-world-rest-api:0.0.1.RELEASE (For CREATE).
+C:\Users\Administrator>kubectl delete deployment hello-world-rest-api  (For DELETE).
+C:\Users\Administrator>kubectl delete services hello-world-rest-api (For DELETE Services)
+C:\Users\Administrator>kubectl describe services (for Details and IPs of default K8S)
+OR
+C:\Users\Administrator>kubectl describe services <serviceName>
+====================================================================================================
+15Feb2022 : Cluster Creation
+
+kubectl get pods
+-------
+kubectl version
+-------
+kubectl create deployment hello-world-rest-api --image=hello-world-rest-api:0.0.1.RELEASE --port=8086 (for local)
+kubectl create deployment hello-world-rest-api --image=in28min/hello-world-rest-api:0.0.1.RELEASE
+-------
+kubectl expose deployment hello-world-rest-api --type=LoadBalancer --port=9090
+-------
+kubectl get events
+----
+kubectl get replicaset
+------
+kubectl get deployment
+------
+kubectl get service  (View the Clusters IP Address and PORT also).
+

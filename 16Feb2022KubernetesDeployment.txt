@@ -1,0 +1,87 @@
+DEPLOYMENT OF A SPRING-BOOT APPLICATION ON SINGLE NODE K8S CLUSTER:
+=====================================================================
++++++++++++++++++++++++++++++++++
++STEP:1  SETUP LOCAL ENVIRONMENT+
++++++++++++++++++++++++++++++++++
+1.Start Docker and K8S Service in Docker Desktop.
+
+2.Open CMD and Type the Commands Below:
+----------------------------------------
+1.minikube start
+---
+2.minikube status
+--
+ OUTPUT Should Be (if not, then dont proceed further):
+     minikube
+     type: Control Plane
+     host: Running
+     kubelet: Running
+     apiserver: Running
+     kubeconfig: Configured
+------------------------------
+3.kubectl cluster-info     (Show Information about CLUSTER)
+--
+ OUTPUT Should Be Like this
+Kubernetes control plane is running at https://127.0.0.1:49998
+CoreDNS is running at https://127.0.0.1:49998/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+------------------------------------------------------------------------------------------------------------
+4.kubectl get node       (Show Information about NODE, in our case Single Node)
+--
+ OUTPUT Should Be Like this
+NAME       STATUS   ROLES                  AGE   VERSION
+minikube   Ready    control-plane,master   16m   v1.23.1
+------------------------------------------------------------------------------------------------------------
+++++++++++++++++++++++++++++++++++++++++
++STEP:2  CREATE SPRING-BOOT APPLICATION+
+++++++++++++++++++++++++++++++++++++++++
+Project Name: D:\MyProjects\springboot-docker-demo
+---
+In application.properties file
+---
+server.port=8085
+URL= http://localhost:8085/message (rest controller)
+---
+Maven Clean and Install for generation the jar file
+---
+Dockerfile
+#Define Base Docker Image
+FROM openjdk:11
+LABEL maintainer="javaguides.net"
+ADD target/springboot-docker-demo-0.0.1-SNAPSHOT.jar springboot-docker-demo.jar
+ENTRYPOINT ["java","-jar","springboot-docker-demo.jar"]
+---
+docker login, then
+docker build -t rajeshduttanmbr/kubern8s:5 .
+---
+[ docker run -p 8096:8080 rajeshdutta(user)/kubern8s:5
+---
+http://localhost:8096/welcome  (only verify working or not) then we delete for port availability ]
+===================================================================================================
+HOW KUBERNETES READ OUR DOCKER REPOSITORIES
+(ALLOW K8S TO READ OUR DOCKER REPOSITORY)
+
+(a) minikube docker-env
+---
+ OUTPUT Should Be Like this
+SET DOCKER_TLS_VERIFY=1
+SET DOCKER_HOST=tcp://127.0.0.1:49995
+SET DOCKER_CERT_PATH=C:\Users\Administrator\.minikube\certs
+SET MINIKUBE_ACTIVE_DOCKERD=minikube
+REM To point your shell to minikube's docker-daemon, run:
+REM @FOR /f "tokens=*" %i IN ('minikube -p minikube docker-env --shell cmd') DO @%i
+----------------------------------------------------------------------------------------
+(b)copy last line "@FOR /f "tokens=*" %i IN ('minikube -p minikube docker-env --shell cmd') DO @%i"
+then paste in cmd like below to view all k8s containers
+C:\Users\Administrator>@FOR /f "tokens=*" %i IN ('minikube -p minikube docker-env --shell cmd') DO @%i
+==========================================================================================================
+kubectl create deployment kubern8s --image=k8sdemo:9 --port=8096      (it will create a deployment object by k8s)
+kubectl describe deployment kubern8s
+kubectl get pods  (it create a pod, inside this a single container)
+kubectl logs hello-world-rest-api-7d8bc79659-pk75s (It will run the Application but not giving IP)
+------------------------------------------------------------------
+For this We have to Expose the particular deployment service
+---
+kubectl expose deployment kubern8s-6587c84fbf-w5tvj --type=NodePort
+
+NOW SERVICES like LoadBalancer,Scling, Expose, ReplicaSet, and Multi Node Cluster (Multi Cluster Master-Node Working)
+
